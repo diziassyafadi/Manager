@@ -1,0 +1,27 @@
+{
+  "_note": "GitHub Projects v2 field config. To add another project, copy the 'SRE-task' block, change the key to the repo name, and update project_number + IDs. Run the bootstrap query in push-issue SKILL.md to populate IDs for new entries.",
+  "_env": ".claude/.env (GITHUB_PAT, GITHUB_ISSUE_ASSIGNEES)",
+  "SRE-task": {
+    "owner": "GDP-ADMIN",
+    "repo": "SRE-task",
+    "project_number": 361,
+    "assignees": "$GITHUB_ISSUE_ASSIGNEES",
+    "project_id": "PVT_kwDOACQejc4A7SVA",
+    "fields": {
+      "status": {
+        "id": "PVTSSF_lADOACQejc4A7SVAzgvoVME",
+        "options": {
+          "backlog":     "f75ad846",
+          "ready":       "61e4505c",
+          "in-progress": "47fc9ee4",
+          "in-review":   "df73e18b",
+          "done":        "98236657",
+          "on-hold":     "c33ced5c"
+        }
+      },
+      "due_date": {
+        "id": "PVTF_lADOACQejc4A7SVAzgvoVNE"
+      }
+    }
+  }
+}

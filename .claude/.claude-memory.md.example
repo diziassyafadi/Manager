@@ -1,0 +1,24 @@
+# Claude Session Memory
+
+> Lightweight context file for session resumption. Claude reads this at the start of each session
+> to quickly orient without scanning the full task history.
+
+## Active Tasks
+
+_None yet._
+
+## Recently Completed
+
+_None yet._
+
+## Current Focus
+
+_None yet._
+
+## Blockers
+
+_None._
+
+## Notes
+
+_None yet._
