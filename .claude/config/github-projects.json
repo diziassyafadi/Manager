@@ -6,7 +6,7 @@
     "repo": "SRE-task",
     "project_number": 361,
     "assignees": "$GITHUB_ISSUE_ASSIGNEES",
-    "project_id": "PVT_kwDOACQejc4A7SVA",
+    "project_id": "$GITHUB_PROJECT_ID",
     "fields": {
       "status": {
         "id": "PVTSSF_lADOACQejc4A7SVAzgvoVME",
