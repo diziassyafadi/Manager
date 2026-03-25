@@ -27,7 +27,7 @@ Manager/
     │   ├── new-task/SKILL.md
     │   ├── push-issue/SKILL.md
     │   ├── update-issue/SKILL.md
-    │   ├── import-issue/SKILL.md
+    │   ├── import-github-issue/SKILL.md
     │   └── weekly-report/SKILL.md
     ├── docs/                     # Skill usage guides
     ├── rules/                    # Operational rules for Claude
@@ -73,7 +73,7 @@ type: Task             # Task | Bug | Feature
 | `/new-task` | `new-task [name]` | Interactive task creation + optional GitHub push |
 | `/push-issue` | `push-issue [file]` | Creates/updates GitHub Issue + syncs to Projects v2 |
 | `/update-issue` | `update-issue [file] [comment: ...] [pr: ...]` | Syncs task changes back to GitHub, posts comments |
-| `/import-issue` | `import-issue <issue-number-or-url>` | Pulls GitHub Issue into local task file |
+| `/import-github-issue` | `import-github-issue <issue-number-or-url>` | Pulls GitHub Issue into local task file |
 | `/weekly-report` | `weekly-report [date]` | Generates weekly report from tasks + calendar events |
 
 See `.claude/docs/` for detailed usage guides for each skill.
@@ -95,7 +95,7 @@ GITHUB_ISSUE_ASSIGNEES=your_github_username
 
 Required GitHub PAT scopes: `repo`, `project`
 
-### 2. GitHub MCP (for push-issue / update-issue / import-issue)
+### 2. GitHub MCP (for push-issue / update-issue / import-github-issue)
 
 ```bash
 claude mcp add --scope project github-mcp https://api.githubcopilot.com/mcp/

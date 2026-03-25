@@ -1,4 +1,4 @@
-# /import-issue — Usage Guide
+# /import-github-issue — Usage Guide
 
 Import an existing GitHub Issue from `gdp-admin/SRE-task` into a local task file.
 
@@ -7,13 +7,13 @@ Import an existing GitHub Issue from `gdp-admin/SRE-task` into a local task file
 ## Usage
 
 ```
-/import-issue <issue-number-or-url>
+/import-github-issue <issue-number-or-url>
 ```
 
 | Form | Behavior |
 |---|---|
-| `/import-issue 3435` | Import issue #3435 |
-| `/import-issue https://github.com/GDP-ADMIN/SRE-task/issues/3435` | Same, from URL |
+| `/import-github-issue 3435` | Import issue #3435 |
+| `/import-github-issue https://github.com/GDP-ADMIN/SRE-task/issues/3435` | Same, from URL |
 
 ---
 
@@ -71,10 +71,10 @@ If a local task file already has `issue: <number>`, Claude will ask before overw
 
 ```
 # Import by number
-/import-issue 3400
+/import-github-issue 3400
 
 # Import by URL (useful when copying from browser)
-/import-issue https://github.com/GDP-ADMIN/SRE-task/issues/3400
+/import-github-issue https://github.com/GDP-ADMIN/SRE-task/issues/3400
 
 # Then start working and sync changes
 /update-issue 2026-03-22-<slug>.md
