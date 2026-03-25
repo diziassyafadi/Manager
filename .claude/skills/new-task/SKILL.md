@@ -99,12 +99,12 @@ Add the new task to `.claude/.claude-memory.md` under **Active Tasks**:
 
 ---
 
-### 6. Ask about GitHub push
+### 6. Ask about GitHub sync
 
 After confirming the file was created, ask:
 
 > Task file created: `tasks/<filename>`
-> Do you want to push this to GitHub Issues now? (yes/no)
+> Do you want to sync this to GitHub Issues now? (yes/no)
 
-- If **yes**: execute the `/push-issue` skill logic inline (do not ask Dizi to run it separately).
-- If **no**: remind Dizi they can run `/push-issue <filename>` anytime later.
+- If **yes**: execute the `/sync-issue` skill logic inline (do not ask Dizi to run it separately).
+- If **no**: remind Dizi they can run `/sync-issue <filename>` anytime later.

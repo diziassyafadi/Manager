@@ -3,86 +3,41 @@ name: import-github-issue
 description: Imports a GitHub Issue into a local task file in tasks/. Triggers when Dizi says "import issue", "pull issue from GitHub", "create local task from issue", provides a GitHub issue number, URL, or assignee username.
 ---
 
-Import a GitHub issue into `tasks/` as a local task file.
+Import a GitHub issue into `tasks/`.
 
-**Argument:** issue number (e.g. `3435`), full GitHub URL, or assignee username (e.g. `diziassyafadi`).
+**Argument:** `$ARGUMENTS` — issue number, full URL, or assignee username. No argument → ask.
 
----
-
-## Workflow
+## Steps
 
 ### 1. Parse argument
+- URL → extract number from `.../issues/<N>`
+- Number → use directly
+- Username → list issues: `python3 .claude/skills/import-github-issue/scripts/list_issues.py <username>` → present numbered list, ask which to import
 
-- Full URL → extract number from path (`.../issues/<number>`)
-- Plain number → use directly
-- Assignee username → run [Assignee flow](#assignee-flow) below
-- No argument → ask: "Which issue number do you want to import?"
+### 2. Check duplicate
+`grep -rl "issue: <number>" tasks/` — if found, ask to overwrite; stop if no.
 
-### 2. Check for duplicate
-
-```bash
-grep -rl "issue: <number>" tasks/
-```
-
-If found, ask: "Issue #<number> already exists as `<filename>`. Overwrite? (yes/no)" — stop if no.
-
-### 3. Fetch issue
-
-```bash
-python3 .claude/skills/import-github-issue/scripts/fetch_issue.py <number>
-```
-
-Outputs JSON with: `number`, `title`, `body`, `state`, `status`, `type`, `node_id`, `owner`, `repo`.
-
-### 4. Parse body
-
+### 3. Fetch, parse, write
 ```bash
 python3 .claude/skills/import-github-issue/scripts/fetch_issue.py <number> \
   | python3 .claude/skills/import-github-issue/scripts/parse_issue_body.py \
-  > /tmp/issue_parsed.json
+  | python3 .claude/skills/import-github-issue/scripts/generate_task_file.py
 ```
+Prints created file path (e.g. `tasks/2026-03-24-some-slug.md`).
 
-Adds: `description`, `action_item`, `blocker`, `dependencies`, `labels`, `due`.
-
-### 5. Write task file
-
-```bash
-python3 .claude/skills/import-github-issue/scripts/generate_task_file.py \
-  < /tmp/issue_parsed.json
-```
-
-Prints the created file path (e.g. `tasks/2026-03-24-<slug>.md`).
-
-### 6. Update session memory
-
+### 4. Update session memory
 Add to `.claude/.claude-memory.md` under **Active Tasks**:
 ```
 - [<filename>](tasks/<filename>) — <title> (`<status>`, #<issue>)
 ```
 
-### 7. Confirm
-
+### 5. Confirm
 ```
-✓ Issue #<number> imported → tasks/<filename>
-  Title:  <title>
-  Status: <status>
-  Due:    <due or "not set">
+✓ Issue #<N> imported → tasks/<filename>
+  Title: <title> | Status: <status> | Due: <due or "not set">
 ```
 
----
-
-## Assignee flow
-
-```bash
-python3 .claude/skills/import-github-issue/scripts/list_issues.py <username>
-```
-
-Outputs a JSON array of `{ number, title, state, labels }`. Present as a numbered list and ask which issue to import, then resume from step 3.
-
----
-
-## Config & env
-
-- Config: `.claude/config/github-projects.json` — owner, repo, project_number, status option IDs
-- Env: `.claude/.env` — `GITHUB_PAT`, `GITHUB_ISSUE_REPO` (config key, e.g. `SRE-task`), `GITHUB_ORG`
-- Scripts default to `GITHUB_ISSUE_REPO` for the config key — pass `--repo <key>` to override
+## Config
+- `.claude/config/github-projects.json` — owner, repo, project config
+- `.claude/.env` — `GITHUB_PAT`, `GITHUB_ISSUE_REPO`, `GITHUB_ORG`
+- Scripts default to `GITHUB_ISSUE_REPO`; pass `--repo <key>` to override
