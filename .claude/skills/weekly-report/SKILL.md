@@ -3,7 +3,7 @@ name: weekly-report
 description: Generate a weekly work report from local task files in a standard format. Trigger when Dizi says "weekly report", "generate weekly report", "weekly recap", or "what did I do this week".
 ---
 
-Generate a weekly report markdown file in `.claude/report/` from task files and Google Calendar.
+Generate a weekly report markdown file in `report/` from task files and Google Calendar, then publish it as a formatted Google Doc.
 
 **Argument:** `$ARGUMENTS`
 - No argument → use the most recent "[Fill Weekly Report: ...]" email to determine the week range
@@ -84,7 +84,7 @@ Wait for Dizi's reply before proceeding to step 5.
 
 ### 5. Build and write the markdown report
 
-Write the report to `.claude/report/<WEEK_START>_<WEEK_END>.md` using the template below.
+Write the report to `report/<WEEK_START>_<WEEK_END>.md` using the template below.
 
 For each section:
 - If there is data, fill it in with the appropriate format.
@@ -147,8 +147,8 @@ Omit the GitHub link if `issue` is null. Omit a sub-section header if it has no 
 **Key Metrics / OMTM**:
 ```
 Ticket response time in a week within 0.5 hour.
-Average individual response time: <individual_time> / 0.5 hour
-Average team response time: <team_time> / 0.8 hour.
+- Average individual response time: <individual_time> / 0.5 hour
+- Average team response time: <team_time> / 0.8 hour.
 ```
 Use `-` for any value Dizi did not provide.
 
@@ -164,13 +164,22 @@ Use `-` for any value Dizi did not provide.
 
 **Out of Office**: date range string (e.g., `March 25–26, 2026`).
 
-### 6. Confirm
+### 6. Publish to Google Docs
+
+Call `mcp__workspace-mcp__import_to_google_doc`:
+- `user_google_email`: `raden.d.a.putra@gdplabs.id`
+- `file_name`: `Weekly Report Dizi — <WEEK_START> to <WEEK_END>`
+- `content`: the full markdown string written in step 5
+- `source_format`: `md`
+
+This converts the markdown to a formatted Google Doc (headings, bullets, bold preserved).
+
+### 7. Confirm
 
 ```
-Report generated → .claude/report/<WEEK_START>_<WEEK_END>.md
+Report generated → report/<WEEK_START>_<WEEK_END>.md
+Google Doc → <link returned by import_to_google_doc>
 Week: WEEK_START → WEEK_END
 Sections filled: <list sections that were written>
 Sections skipped (no data): <list sections left as placeholder>
 ```
-
-Dizi can then copy the markdown content into the Google Doc manually.

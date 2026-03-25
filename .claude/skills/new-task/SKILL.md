@@ -29,21 +29,9 @@ Ask Dizi the following questions **one at a time**, waiting for each answer befo
 
 ---
 
-### 2. Generate the slug and filename
+### 2. Generate action items (if Q3 was skipped)
 
-- Slug: lowercase task name, spaces → hyphens, strip special characters
-  - Example: "Fix ingress timeout on glchat-be" → `fix-ingress-timeout-on-glchat-be`
-- Filename: `<today's date>-<slug>.md`
-  - Example: `2026-03-22-fix-ingress-timeout-on-glchat-be.md`
-- Path: `tasks/<filename>`
-
----
-
-### 3. Generate action items (if Q3 was skipped)
-
-Based on the goal from Q2, generate 3–5 concrete, SRE-oriented action items as a checklist. These are suggestions — Dizi will adjust them manually if needed.
-
-Label them clearly:
+Based on Q2, generate 3–5 concrete SRE-oriented action items:
 ```
 <!-- AI-generated — adjust as needed -->
 - [ ] <action item 1>
@@ -53,58 +41,26 @@ Label them clearly:
 
 ---
 
-### 4. Create the task file
+### 3. Create the task file
 
-Write the file to `tasks/<filename>` using this exact template:
+Pipe action items to stdin:
 
-```markdown
----
-title: <task name from Q1>
-status: backlog
-created: <today's date YYYY-MM-DD>
-completed: null
-due: <due date from Q4, or null>
-issue: null
-parent: null
-type: Task
----
-
-**Labels** :
-- 
-
-# Description and Contexts
-<goal from Q2>
-
-# Action Item
-<action items from Q3, or AI-generated items from step 3>
-
-# Current Issue / Blocker
-N/A
-
-# Dependencies (Optional)
-N/A
-
-## Result
-N/A
+```bash
+printf '<action items, one per line>' | \
+python3 .claude/skills/new-task/scripts/create_task_file.py \
+  --title "<title>" \
+  --description "<goal from Q2>" \
+  [--due <YYYY-MM-DD>]
 ```
 
----
-
-### 5. Update session memory
-
-Add the new task to `.claude/.claude-memory.md` under **Active Tasks**:
-```
-- [<filename>](tasks/<filename>) — <title> (`backlog`)
-```
+Prints the created file path (e.g. `tasks/2026-03-25-fix-something.md`).
 
 ---
 
-### 6. Ask about GitHub sync
-
-After confirming the file was created, ask:
+### 4. Ask about GitHub sync
 
 > Task file created: `tasks/<filename>`
 > Do you want to sync this to GitHub Issues now? (yes/no)
 
-- If **yes**: execute the `/sync-issue` skill logic inline (do not ask Dizi to run it separately).
+- If **yes**: execute `/sync-issue` inline.
 - If **no**: remind Dizi they can run `/sync-issue <filename>` anytime later.

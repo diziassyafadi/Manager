@@ -25,13 +25,7 @@ python3 .claude/skills/import-github-issue/scripts/fetch_issue.py <number> \
 ```
 Prints created file path (e.g. `tasks/2026-03-24-some-slug.md`).
 
-### 4. Update session memory
-Add to `.claude/.claude-memory.md` under **Active Tasks**:
-```
-- [<filename>](tasks/<filename>) — <title> (`<status>`, #<issue>)
-```
-
-### 5. Confirm
+### 4. Confirm
 ```
 ✓ Issue #<N> imported → tasks/<filename>
   Title: <title> | Status: <status> | Due: <due or "not set">
