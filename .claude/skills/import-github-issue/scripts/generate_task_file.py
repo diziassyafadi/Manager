@@ -29,11 +29,11 @@ def render(data, today):
 
     return (
         f"---\n"
-        f"title: {data['title']}\n"
+        f"title: {json.dumps(data['title'])}\n"
         f"status: {data['status']}\n"
         f"created: {today}\n"
         f"completed: {completed}\n"
-        f"due: {due}\n"
+        f"due: {json.dumps(due) if due != 'null' else 'null'}\n"
         f"issue: {data['number']}\n"
         f"parent: null\n"
         f"type: {data.get('type', 'Task')}\n"

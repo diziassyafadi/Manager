@@ -13,6 +13,7 @@ Usage:
 Output: path of the created file (e.g. tasks/2026-03-25-fix-something.md)
 """
 import argparse
+import json
 import re
 import sys
 from datetime import date
@@ -28,11 +29,11 @@ def slugify(title, max_len=60):
 def render(title, description, action_items, due, today):
     return (
         f"---\n"
-        f"title: {title}\n"
+        f"title: {json.dumps(title)}\n"
         f"status: backlog\n"
         f"created: {today}\n"
         f"completed: null\n"
-        f"due: {due or 'null'}\n"
+        f"due: {json.dumps(due) if due else 'null'}\n"
         f"issue: null\n"
         f"parent: null\n"
         f"type: Task\n"
