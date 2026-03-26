@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Fetch a GitHub issue and its Projects v2 status.
+"""Fetch a GitHub issue and its Projects v2 status, type, and parent.
 
 Usage:
     python3 fetch_issue.py <issue_number> [--config PATH] [--env PATH] [--repo KEY]
 
-Output: JSON to stdout with fields: number, title, body, state, status, type, node_id, owner, repo
+Output: JSON to stdout with fields: number, title, body, state, status, type, node_id, owner, repo, parent
 """
 import argparse
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.request
@@ -61,7 +62,8 @@ def gh_graphql(pat, query):
         sys.exit(1)
 
 
-def get_project_status(pat, node_id, project_number, status_options):
+def get_project_fields(pat, node_id, project_number, status_options):
+    """Query GitHub Projects v2 for status and parent fields."""
     query = f"""{{
       node(id: "{node_id}") {{
         ... on Issue {{
@@ -73,6 +75,14 @@ def get_project_status(pat, node_id, project_number, status_options):
                   ... on ProjectV2ItemFieldSingleSelectValue {{
                     name
                     field {{ ... on ProjectV2SingleSelectField {{ name }} }}
+                  }}
+                  ... on ProjectV2ItemFieldTextValue {{
+                    text
+                    field {{ ... on ProjectV2TextField {{ name }} }}
+                  }}
+                  ... on ProjectV2ItemFieldNumberValue {{
+                    number
+                    field {{ ... on ProjectV2NumberField {{ name }} }}
                   }}
                 }}
               }}
@@ -88,18 +98,32 @@ def get_project_status(pat, node_id, project_number, status_options):
         .get("projectItems", {})
         .get("nodes", [])
     )
+    status = "backlog"
+    parent = None
+
     for item in items:
         if item.get("project", {}).get("number") == project_number:
             for fv in item.get("fieldValues", {}).get("nodes", []):
                 field_name = fv.get("field", {}).get("name", "").lower()
+
+                # Extract status
                 if field_name == "status":
                     raw_name = fv.get("name", "").lower().replace(" ", "-")
-                    # Reverse-map option name to status key
                     for status_key in status_options:
                         if status_key.lower() == raw_name:
-                            return status_key
-                    return "backlog"
-    return "backlog"
+                            status = status_key
+                            break
+
+                # Extract parent (as text or number field)
+                if field_name == "parent":
+                    parent_val = fv.get("text") or fv.get("number")
+                    if parent_val:
+                        # Extract issue number (e.g., "#3019" or "3019")
+                        m = re.search(r"#?(\d+)", str(parent_val))
+                        if m:
+                            parent = int(m.group(1))
+
+    return status, parent
 
 
 def main():
@@ -146,11 +170,12 @@ def main():
         print(f"ERROR: #{args.issue_number} is a pull request, not an issue", file=sys.stderr)
         sys.exit(1)
 
-    # Determine status
+    # Determine status and parent
     if issue["state"] == "closed":
         status = "done"
+        parent = None
     else:
-        status = get_project_status(pat, issue["node_id"], project_number, status_options)
+        status, parent = get_project_fields(pat, issue["node_id"], project_number, status_options)
 
     # Infer type from labels (Bug > Feature > Task)
     issue_type = "Task"
@@ -172,6 +197,7 @@ def main():
         "node_id": issue["node_id"],
         "owner": owner,
         "repo": repo,
+        "parent": parent,
     }, indent=2))
 
 

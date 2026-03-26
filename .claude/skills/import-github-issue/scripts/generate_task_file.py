@@ -26,6 +26,7 @@ def render(data, today):
     labels_block = "\n".join(f"- {lb}" for lb in data.get("labels", ["Operational"]))
     completed = today if data.get("state") == "closed" else "null"
     due = data.get("due") or "null"
+    parent = data.get("parent") or "null"
 
     return (
         f"---\n"
@@ -35,7 +36,7 @@ def render(data, today):
         f"completed: {completed}\n"
         f"due: {json.dumps(due) if due != 'null' else 'null'}\n"
         f"issue: {data['number']}\n"
-        f"parent: null\n"
+        f"parent: {parent}\n"
         f"type: {data.get('type', 'Task')}\n"
         f"---\n"
         f"\n"

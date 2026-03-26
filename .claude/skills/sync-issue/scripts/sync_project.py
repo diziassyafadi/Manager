@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Sync a GitHub issue to a Projects v2 board (status + due date).
+"""Sync a GitHub issue to a Projects v2 board (status, due date, parent).
 
 Usage:
-    python3 sync_project.py <issue_number> <status> [--due YYYY-MM-DD] [--config PATH] [--env PATH] [--repo KEY]
+    python3 sync_project.py <issue_number> <status> [--due YYYY-MM-DD] [--parent ISSUE_NUMBER] [--config PATH] [--env PATH] [--repo KEY]
 
 Performs:
     1. Gets the issue node ID via REST
     2. Adds the issue to the project (idempotent)
     3. Sets the Status field
     4. Sets the Due Date field (if --due provided)
+    5. Sets the Parent field (if --parent provided)
 
-Output: JSON with node_id, item_id, project_id, status, due
+Output: JSON with node_id, item_id, project_id, status, due, parent
 """
 import argparse
 import json
@@ -72,6 +73,7 @@ def main():
     parser.add_argument("issue_number", type=int)
     parser.add_argument("status", help="Task status (e.g. backlog, in-progress)")
     parser.add_argument("--due", default=None, help="Due date YYYY-MM-DD")
+    parser.add_argument("--parent", default=None, help="Parent issue number")
     parser.add_argument("--config", default=".claude/config/github-projects.json")
     parser.add_argument("--env", default=".claude/.env")
     parser.add_argument("--repo", default=None)
@@ -100,6 +102,7 @@ def main():
     status_field_id = cfg["fields"]["status"]["id"]
     status_options = cfg["fields"]["status"]["options"]
     due_field_id = cfg["fields"]["due_date"]["id"]
+    parent_field_id = cfg.get("fields", {}).get("parent", {}).get("id")
 
     # 1. Get issue node ID
     issue = gh_rest(
@@ -136,12 +139,23 @@ def main():
           }}) {{ projectV2Item {{ id }} }}
         }}''')
 
+    # 5. Set parent field (optional, if field is configured)
+    if args.parent and parent_field_id:
+        gh_graphql(pat, f'''mutation {{
+          updateProjectV2ItemFieldValue(input: {{
+            projectId: "{project_id}", itemId: "{item_id}",
+            fieldId: "{parent_field_id}",
+            value: {{text: "{args.parent}"}}
+          }}) {{ projectV2Item {{ id }} }}
+        }}''')
+
     print(json.dumps({
         "node_id": node_id,
         "item_id": item_id,
         "project_id": project_id,
         "status": args.status,
         "due": args.due,
+        "parent": args.parent,
     }))
 
 

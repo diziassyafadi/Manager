@@ -38,11 +38,14 @@ Read `.claude/.env` for `GITHUB_ISSUE_ASSIGNEES`.
 ### 3. Sync project fields
 
 ```bash
-python3 .claude/skills/sync-issue/scripts/sync_project.py <issue_number> <status> [--due <date>]
+python3 .claude/skills/sync-issue/scripts/sync_project.py <issue_number> <status> [--due <date>] [--parent <issue_number>]
 ```
 
-### 4. Link sub-issue (if `parent` set in JSON)
+Syncs to GitHub Projects v2: status, due date, and parent field (if configured in config JSON).
 
+### 4. Link sub-issue (optional, if using GitHub issue links)
+
+If organizing via GitHub issue links (separate from Projects field sync):
 Use `node_id` from step 3 output.
 `mcp__github__sub_issue_write` method `add`: owner=`gdp-admin`, repo=`SRE-task`, issue_number=`<parent>`, sub_issue_id=`<node_id>`, replace_parent=true.
 
@@ -59,8 +62,7 @@ Full URL → use as-is. Number only → ask Dizi for full URL.
 
 ```
 ✓ Issue #<N> <created|updated> → https://github.com/gdp-admin/SRE-task/issues/<N>
-  ↳ Project: Status=<status>, Due=<due or "not set">
-  ↳ Sub-issue of #<parent>    ← if applicable
+  ↳ Project: Status=<status>, Due=<due or "not set">, Parent=<parent or "not set">
   ↳ Comment posted             ← if applicable
   ↳ PR attached: <url>         ← if applicable
 ```

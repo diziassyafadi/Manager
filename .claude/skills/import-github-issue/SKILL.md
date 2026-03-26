@@ -28,8 +28,16 @@ Prints created file path (e.g. `tasks/2026-03-24-some-slug.md`).
 ### 4. Confirm
 ```
 ✓ Issue #<N> imported → tasks/<filename>
-  Title: <title> | Status: <status> | Due: <due or "not set">
+  Title: <title> | Status: <status> | Parent: <parent or "none"> | Due: <due or "not set">
 ```
+
+## What's extracted from GitHub
+
+- **Status:** from GitHub Projects v2 custom field
+- **Parent:** from GitHub Projects v2 "Parent" field (text or number field with issue number)
+- **Type:** inferred from issue labels (Bug > Feature > Task)
+- **Due:** from issue body `> **Due:** YYYY-MM-DD` pattern
+- **Labels:** from issue body `**Labels** :` block
 
 ## Config
 - `.claude/config/github-projects.json` — owner, repo, project config
